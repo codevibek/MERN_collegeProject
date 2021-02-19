@@ -34,24 +34,37 @@ const Dashboard = () => {
 
    
     
-    // const updateCollege = (id) =>{
-    //     Axios.put("http://localhost:3001/update",{name:newName,id})
-    //     .then((res)=> {
-    //         console.log(res)
-    //     })
-    // }
+    const updateCollege = (id) =>{
+        Axios.put("http://localhost:3001/update",{
+          name, 
+          noOfStudent, 
+          fee, 
+          location, 
+          facility, 
+          pastResult, 
+          eca,
+          phone,
+          email,
+          id
+        })
+        .then(()=> {
+            console.log("updated Succesfully")
+        })
+    }
     const deleteCollege =(id)=> {
         Axios.delete(`http://localhost:3001/delete/${id}`)
     }
     
     const [modalIsOpen,setIsOpen] = React.useState(false);
+    const [secondIsOpen, setSecondIsOpen] = useState(false)
     function openModal() {
       setIsOpen(true);
     }
-   
-    function afterOpenModal() {
-      // references are now sync'd and can be accessed.
+    function openSecondModal(){
+      setSecondIsOpen(true)
     }
+   
+  
     const addCollege = () => {
         Axios.post('http://localhost:3001/create',{
             name, 
@@ -69,6 +82,11 @@ const Dashboard = () => {
       setIsOpen(false); 
       addCollege()
     }
+    function closeSecondModal(){
+      setSecondIsOpen(false)
+      updateCollege()
+    }
+
     return (
         
         <div className="dashboard"id="dashboard" style={{display:"flex",flexDirection:"column",justifyContent:"center",alignItems:"center"}}>
@@ -95,7 +113,7 @@ const Dashboard = () => {
                         <td>{c.c_pastresult}%</td>
                         <td>{c.c_facility}</td>
                         <td>{c.c_noofstudents}</td>
-                        <td><button>Update</button></td>
+                        <td><button onClick={()=>openSecondModal(c.c_id)}>Update</button></td>
                         <td><button onClick={()=>{deleteCollege(c.c_id)}}>Delete</button></td>
                     </tr>
                         
@@ -107,7 +125,6 @@ const Dashboard = () => {
                 <div className="modal">
         <Modal
           isOpen={modalIsOpen}
-          onAfterOpen={afterOpenModal}
           onRequestClose={closeModal}
           style={customStyles}
           contentLabel="Example Modal"
@@ -135,6 +152,37 @@ const Dashboard = () => {
 
         </div>
           <button onClick={closeModal}>Add</button>
+          
+        </Modal>
+        <Modal
+          isOpen={secondIsOpen}
+          onRequestClose={closeSecondModal}
+          style={customStyles}
+          contentLabel="Example Modal"
+        >
+            <div className="form" style={{display:"flex",flexDirection:"column",alignItems:"center"}}>
+            <label>Name</label>
+            <input type="text" onChange={(e)=>setName(e.target.value)}/>
+
+            <label>No of Student</label>
+            <input type="number" onChange={(e)=>setNoOfStudent(e.target.value)}/>
+            <label>Fee</label>
+            <input type="text" onChange={(e)=>setFee(e.target.value)}/>
+            <label>Location</label>
+            <input type="text" onChange={(e)=>setLocation(e.target.value)}/>
+            <label>Facility</label>
+            <input type="text" onChange={(e)=>setFacility(e.target.value)}/>
+            <label>passResult</label>
+            <input type="number" onChange={(e)=>setPassResult(e.target.value)}/>
+            <label>ECA</label>
+            <input type="text" onChange={(e)=>setEca(e.target.value)}/>
+            <label>Email</label>
+            <input type="email" onChange={(e)=>setEmail(e.target.value)}/>
+            <label>Phone</label>
+            <input type="number" onChange={(e)=>setPhone(e.target.value)}/>
+
+        </div>
+          <button onClick={closeSecondModal}>Update</button>
           
         </Modal>
                 </div>

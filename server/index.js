@@ -4,8 +4,29 @@ const app  = express()
 const mysql = require('mysql')
 const cors = require('cors')
 
-app.use(cors())
+const bodyParser = require('body-parser')
+const cookieParser = require('cookie-parser')
+const session = require('express-session')
+
+app.use(cors({
+    origin:["http://localhost:3000"],
+    methods:["GET","POST"],
+    credentials:true
+}))
 app.use(express.json())
+
+app.use(cookieParser())
+app.use(bodyParser.urlencoded({extended:true}))
+
+app.use(session({
+    key:"userId",
+    secret:"college",
+    resave:false, 
+    saveUninitialized:false,
+    cookie:{
+        expires:60*60*24*7,
+    }
+}))
 
 const db = mysql.createConnection({
     user:"root",
@@ -35,16 +56,66 @@ app.post('/create',(req , res) =>{
          }
      })
 })
+app.post('/rate',(req,res)=>{
+    const u_id = req.body.u_id;
+    const id = req.body.id;
+    const rate = req.body.inputRating;
+    const review = req.body.inputReview;
+    db.query('SELECT * FROM tbl_userrate WHERE u_id=?',[u_id],(err,result)=>{
+        if(result.length>0){
+            db.query('UPDATE tbl_userrate SET u_rate=?,  u_review=? WHERE u_id= ?',[rate,review,u_id],
+            (err,resul)=>{
+                if(err){
+                    console.log(err)
+                }else{
+                    res.send("Rating Updated Successfully")
+                }
+            })
+        }
+        else{
+            db.query('INSERT INTO tbl_userrate (u_id,c_id,u_rate,u_review) VALUES (?,?,?,?)',
+            [u_id,id,rate,review],(err,resul)=>{
+                if(err){
+                    console.log(err)
+                }else{
+                    res.send("Rated Successfully")
+                }
+            })
+        }
+    })
+   
+})
 app.post('/register',(req, res) => {
     const userName = req.body.userName;
     const email = req.body.email;
     const password = req.body.password;
 
+    db.query('SELECT * FROM tbl_user WHERE u_email=?',email,(err,result)=>{
+        if(result.length>0){
+            res.send("User Already Exist")
+        }
+        else{
+            db.query("INSERT INTO tbl_user (u_name, u_email, u_password) VALUES (?,?,?)",[userName,email,password],(err,result) => {
+                if(err){
+                    res.send(err)
 
-
-    db.query("INSERT INTO tbl_user (u_name, u_email, u_password) VALUES (?,?,?)",[userName,email,password],(err,result) => {
-        console.log(err)
+                }
+                else{
+                    res.send("User registered Successfully")
+                }
+            })
+        }
     })
+
+
+   
+})
+app.get('/user',(req,res)=>{
+    if(req.session.user){
+        res.send({loggedIn:true, user:req.session.user})
+    }else{
+        res.send({loggedIn:false})
+    }
 })
 app.post('/userlogin',(req,res)=>{
     const email = req.body.email;
@@ -57,9 +128,12 @@ app.post('/userlogin',(req,res)=>{
 
         }else{
             if(result.length>0){
+                
+                req.session.user = result
+                console.log(req.session.user)
                 res.send({message:"success"})
             }else{
-                res.send({message:"wrong Combiantion"})
+                res.send({message:"User doesn't exist"})
             }}
 })
 })

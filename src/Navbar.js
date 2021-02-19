@@ -2,7 +2,7 @@ import React, {useState} from 'react'
 import {Link} from 'react-router-dom'
 import './Navbar.css'
 
-const Navbar = ({isLoggedIn,loginStatus}) => {
+const Navbar = ({isLoggedIn}) => {
 
     const [input, setInput] = useState('')
 
@@ -23,7 +23,7 @@ const Navbar = ({isLoggedIn,loginStatus}) => {
                 {(isLoggedIn)?
                 (<div>
                     
-                   <Link className="nav__logSignUp" to="/"><button onClick={loginStatus}>LogOut</button> </Link>
+                   <Link className="nav__logSignUp" to="/"><button >LogOut</button> </Link>
 
                     </div>
                 ):

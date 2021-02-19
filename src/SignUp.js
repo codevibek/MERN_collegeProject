@@ -9,16 +9,18 @@ const SignUp = () => {
     const [emailReg, setEmailReg] = useState('')
 
     const register = (e) =>{
-        // e.preventDefault()
-        // Axios.post("http://localhost:3001/register",{
-        //     userName:userNameReg,
-        //     password:passwordReg,
-        //     email:emailReg
-        // }).then(res=>{
-        //     console.log(res)
-        //     history.push("/login")
-
-        // })
+        e.preventDefault()
+        Axios.post("http://localhost:3001/register",{
+            userName:userNameReg,
+            password:passwordReg,
+            email:emailReg
+        }).then(res=>{
+            if(res.data==="User registered Successfully"){
+            history.push("/login")
+             }else{
+            console.log(res.data)
+        }
+        })
         
     }
     return (

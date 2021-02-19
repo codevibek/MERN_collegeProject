@@ -1,5 +1,5 @@
 
-import {useState} from "react"
+import {useState,useEffect} from "react"
 import Navbar from './Navbar.js'
 import {BrowserRouter as Router,Link, Route, Switch,useHistory} from 'react-router-dom'
 import Home from './Home'
@@ -7,42 +7,49 @@ import Login from './Login'
 import SignUp from './SignUp' 
 import CollegeDetail from './CollegeDetail'
 import Dashboard from './dashboard/Dashboard'
+import Axios from "axios"
+
+
 function App() {
-  let history=useHistory()
+  Axios.defaults.withCredentials = true
   const [isLoggedIn,setIsLoggedIn]=useState(false)
-  const loginStatus=(data)=>{
+  const [loginStatus, setLoginStatus] = useState({})
+ 
+  useEffect(() => {
+    Axios.get("http://localhost:3001/user")
+    .then((res)=>{   
+      if (res.data.loggedIn == true){
+        setLoginStatus(res.data.user[0])
+    setIsLoggedIn(res.data.loggedIn)
+      }
     
-    if(data==="success"){
-      setIsLoggedIn(true)
-      // history.push("/")
-    }
-    else{
-      setIsLoggedIn(false)
-    }
-  }
-  console.log(isLoggedIn)
+    })
+    
+}, [])
+console.log(isLoggedIn)
+console.log(loginStatus)
   return (
    <div>
-     <Router>
+     <Router> 
 
         <Switch>
           <Route exact path="/">
           <Navbar/>
 
-            <Home/>
+            <Home  />
           </Route>
           <Route exact path="/login">
-          <Navbar isLoggedIn={isLoggedIn}/>
+          <Navbar />
 
-            <Login loginStatus={loginStatus}/>
+            <Login  />
           </Route>
           <Route exact path="/signup">
-          <Navbar isLoggedIn={isLoggedIn} loginStatus={loginStatus}/>
+          <Navbar  />
 
             <SignUp/>
 
           </Route>
-          <Route path="/collegeDetails/:id" component={CollegeDetail}>
+          <Route path="/collegedetails/:id"   component={CollegeDetail}>
             
           </Route>
           <Route path="/dashboard">
